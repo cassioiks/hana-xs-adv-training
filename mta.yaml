@@ -8,6 +8,15 @@ modules:
     path: web
     requires:
       - name: openSAPHANA6_03-uaa
+      - name: core_xsjs_api
+        group: destinations
+        properties:
+          name: core-xsjs-backend
+          url: '~{url}'
+          forwardAuthToken: true
+      - name: ui5-lib
+        properties:
+          ui5liburl: '~{url}'
   - name: core_db
     type: hdb
     path: core_db
@@ -32,6 +41,18 @@ modules:
       - name: hdi_user_db
         properties:
           TARGET_CONTAINER: '~{user-container-name}'
+  - name: core_xsjs
+    type: nodejs
+    path: core_xsjs
+    provides:
+      - name: core_xsjs_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: hdi_core_db
+      - name: openSAPHANA6_03-uaa
+      - name: core_db
+      - name: sap.hana.democontent.epm.services.images
 resources:
   - name: openSAPHANA6_03-uaa
     type: com.sap.xs.uaa-space
@@ -57,3 +78,14 @@ resources:
       service-name: openSAP.CentralDB.opensap-central-container
     properties:
       central-db-name: '${service-name}'
+  - name: sap.hana.democontent.epm.services.images
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: sap.hana.democontent.epm.services.images.03
+    properties:
+      xshttpdest-images-service-name: '${service-name}'
+  - name: ui5-lib
+    type: configuration
+    parameters:
+      provider-id: 'com.sap.ui5.dist.sapui5-dist-xsa.XSAC_UI5_FESV3:sapui5_fesv3'
+      version: '>=1.44.0'
